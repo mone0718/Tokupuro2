@@ -2,12 +2,12 @@
 % ch1 = Torque
 % ch2 = EMG
 
-% LP = 500 Hz  ‰Û‘è‡@
+% LP = 500 Hz  èª²é¡Œâ‘ 
 % Notch = on
-% HP = 5 Hz  ‰Û‘è‡@
+% HP = 5 Hz  èª²é¡Œâ‘ 
 % Sens HI (x1000)
 
-%”íŒ±Ò–¼
+%è¢«é¨“è€…å
 defaultanswer = {'Masumoto'};
 subject = inputdlg({'subject'},'Input the answer',1,defaultanswer);
 subject_name = char(subject(1));
@@ -15,22 +15,21 @@ subject_name = char(subject(1));
 Force_list = [20,40,60,80];
 iEMG_list = [0,0,0,0];
 
-
 for i = 1:4
 
-    %ƒTƒ“ƒvƒŠƒ“ƒOü”g”
+    %ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°å‘¨æ³¢æ•°
     fs = 1000;
 
-    %‰ğÍ‚·‚éƒf[ƒ^imatƒtƒ@ƒCƒ‹j‚ğ‘I‘ğ‚µA“Ç‚İ‚Ş
-    [fname,pname]=uigetfile('*.mat','‰ğÍ‚·‚éƒf[ƒ^‚ğ‘I‘ğ‚µ‚Ä‚­‚¾‚³‚¢');
+    %è§£æã™ã‚‹ãƒ‡ãƒ¼ã‚¿ï¼ˆmatãƒ•ã‚¡ã‚¤ãƒ«ï¼‰ã‚’é¸æŠã—ã€èª­ã¿è¾¼ã‚€
+    [fname,pname]=uigetfile('*.mat','è§£æã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’é¸æŠã—ã¦ãã ã•ã„');
     FP=[fname pname];
     if fname==0;return;end
-    %fname‚ªƒtƒ@ƒCƒ‹–¼^pname‚Íƒtƒ@ƒCƒ‹‚Ì‚ ‚éêŠiƒfƒBƒŒƒNƒgƒŠj
+    %fnameãŒãƒ•ã‚¡ã‚¤ãƒ«åï¼pnameã¯ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚ã‚‹å ´æ‰€ï¼ˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªï¼‰
     load([pname fname]);
 
-    %ƒtƒBƒ‹ƒ^ƒŠƒ“ƒO
+    %ãƒ•ã‚£ãƒ«ã‚¿ãƒªãƒ³ã‚°
     data_filtered = data;
-    %ƒnƒ€ƒJƒbƒgƒtƒBƒ‹ƒ^:’nˆæü”g”(50Hz)‚Ì”{”‚ğƒtƒBƒ‹ƒ^ƒŠƒ“ƒO
+    %ãƒãƒ ã‚«ãƒƒãƒˆãƒ•ã‚£ãƒ«ã‚¿:åœ°åŸŸå‘¨æ³¢æ•°(50Hz)ã®å€æ•°ã‚’ãƒ•ã‚£ãƒ«ã‚¿ãƒªãƒ³ã‚°
     [b50,a50] = butter(3,[49 51]/500,'stop');
     [b100,a100] = butter(3,[99 101]/500,'stop');
     [b150,a150] = butter(3,[149 151]/500,'stop');
@@ -50,20 +49,20 @@ for i = 1:4
     data_filtered = filtfilt(b400,a400,data_filtered);
     data_filtered = filtfilt(b450,a450,data_filtered);
 
-    %Œv‘ªƒf[ƒ^‚Ì’è‹`
+    %è¨ˆæ¸¬ãƒ‡ãƒ¼ã‚¿ã®å®šç¾©
     Force = data_filtered(:,1);
     EMG = data_filtered(:,2);
-    %EMG‚Í1000ƒÊV¨1V‚È‚Ì‚ÅAƒ}ƒCƒNƒƒ{ƒ‹ƒg’PˆÊ‚É•ÏŠ·i1000”{)
-    %ŠîüƒYƒŒ‚ª‚ ‚é‰Â”\«‚ª‚ ‚é‚Ì‚Å•½‹Ï‚ğˆø‚­:‘S”g®—¬
+    %EMGã¯1000Î¼Vâ†’1Vãªã®ã§ã€ãƒã‚¤ã‚¯ãƒ­ãƒœãƒ«ãƒˆå˜ä½ã«å¤‰æ›ï¼ˆ1000å€)
+    %åŸºç·šã‚ºãƒ¬ãŒã‚ã‚‹å¯èƒ½æ€§ãŒã‚ã‚‹ã®ã§å¹³å‡ã‚’å¼•ã:å…¨æ³¢æ•´æµ
     EMG = (EMG-mean(EMG))*1000;
 
-    %‘S”g®—¬iâ‘Î’l‰»j
+    %å…¨æ³¢æ•´æµï¼ˆçµ¶å¯¾å€¤åŒ–ï¼‰
     rEMG = abs(EMG);
 
-    %ŠÔs—ñ‚ğì¬
+    %æ™‚é–“è¡Œåˆ—ã‚’ä½œæˆ
     time = 0:1/fs:length(Force)/fs-1/fs;
 
-    %¶”gŒ`‚ğ•`‰æ
+    %ç”Ÿæ³¢å½¢ã‚’æç”»
     figure('Position',[1 1 500 700]);
     subplot(2,1,1);
     plot(time,Force);
@@ -75,20 +74,20 @@ for i = 1:4
     ylabel('rEMG (\muV)','FontName','Arial','Fontsize',12);
     xlabel('time (s)','FontName','Arial','Fontsize',12);
 
-    uiwait; %‰½‚©‚ÌƒAƒNƒVƒ‡ƒ“‚ª‚ ‚é‚Ü‚ÅƒvƒƒOƒ‰ƒ€‚ªƒXƒgƒbƒv
+    uiwait; %ä½•ã‹ã®ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ãŒã‚ã‚‹ã¾ã§ãƒ—ãƒ­ã‚°ãƒ©ãƒ ãŒã‚¹ãƒˆãƒƒãƒ—
 
-    %‰ğÍ‘ÎÛ‹æŠÔ‚ğİ’è
-    %ˆÀ’è‚µ‚½2•bŠÔ‚Ìƒf[ƒ^‚ğŒvZ
+    %è§£æå¯¾è±¡åŒºé–“ã‚’è¨­å®š
+    %å®‰å®šã—ãŸ2ç§’é–“ã®ãƒ‡ãƒ¼ã‚¿ã‚’è¨ˆç®—
     defaultanswer = {'12','14'};
-    startend = inputdlg({'start','end'},'‰ğÍ‹æŠÔ‚Ì2•b‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢',1,defaultanswer);
+    startend = inputdlg({'start','end'},'è§£æåŒºé–“ã®2ç§’ã‚’è¨­å®šã—ã¦ãã ã•ã„',1,defaultanswer);
     start_time = str2num(char(startend(1)));
     end_time = str2num(char(startend(2)));
 
-    %‰ğÍ‘ÎÛ‹æŠÔ‚Ì2•b•ª‚Ìƒf[ƒ^‚ğØ‚èo‚µ
+    %è§£æå¯¾è±¡åŒºé–“ã®2ç§’åˆ†ã®ãƒ‡ãƒ¼ã‚¿ã‚’åˆ‡ã‚Šå‡ºã—
     Force = Force(start_time*fs+1:end_time*fs);
     rEMG = rEMG(start_time*fs+1:end_time*fs);
 
-    %2•bŠÔ‚ÌÏ•ªU•‚ğŒv‘ª
+    %2ç§’é–“ã®ç©åˆ†æŒ¯å¹…ã‚’è¨ˆæ¸¬
     iEMG = sum(rEMG);
 
     %Force_list(i) = Force;
@@ -96,49 +95,16 @@ for i = 1:4
 
 end
 
-x = Force_list';
-y = iEMG_list';
+%å›³ç¤º
+plot(Force_list,iEMG_list,'k.');
 
-%’P‰ñ‹A•ªÍ(‰½‚â‚Á‚Ä‚é‚©‚æ‚­‚í‚©‚Á‚Ä‚È‚¢)
-X = [ones(length(x), 1) x]; % Ø•Ğ‚ğŠÜ‚ß‚Ä‹ß—‚ğ‰ü‘P
-b = X\y;
-yCalc = X * b; % ‹ß—’¼ü
-
-%}¦
-hold on
-plot(x, yCalc,'LineWidth', 5,'Color','0.7,0.7,0.7');
-hold off
-
-hold on
-plot(Force_list,iEMG_list,'w.','MarkerSize',55);
-hold off
-
-hold on 
-plot(Force_list,iEMG_list,'k.','MarkerSize',40);
-hold off
-
-%ƒtƒHƒ“ƒgƒTƒCƒY
-fontsize = 16;
-h = gca;
-set(h,'fontsize',fontsize);
-
-title('EMGvsForce');
-
-xlabel('Force (%)');
-ylabel('rEMG (\muV)'); %’PˆÊ‚ ‚â‚µ‚¢
-
-xticks([0, 20, 40, 60, 80]);
-yticks([1.0, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]);
- 
-grid on
-
-%ƒtƒ@ƒCƒ‹‚Ì•Û‘¶
+%ãƒ•ã‚¡ã‚¤ãƒ«ã®ä¿å­˜
 output_filename = sprintf('%s_EMGvsForce',subject_name);
-save(output_filename,'iEMG_list');
+save(output_filename,'iEMG');
 
 
-%‡@Low-pass fileter‚âHigh-pass filter‚Ì’l‚ğŠm”F‚µ‚Ä‹L“ü‚µ‚æ‚¤B
-%‡Afor•¶‚ğg‚Á‚ÄA20%, 40% 60%, 80%‚»‚ê‚¼‚ê‚Ìƒf[ƒ^‚©‚çiEMG‚ğŒvZ‚µ‚ÄA‚Ğ‚Æ‚Â‚Ìs—ñ‚ÉŠi”[‚µ‚æ‚¤B
-%‡BÅŒã‚ÉA‰¡²‚ğu—Íi%MVCjvAc²‚ğuiEMG(ƒÊVjv‚ÌƒOƒ‰ƒt‚ğ•`‰æ‚µ‚Ä‚İ‚æ‚¤B
-%‡C‰ñ‹A’¼üA‰ñ‹A®A“Œv’l‚à“ü‚ê‚Ä‚İ‚æ‚¤B
-%‡Di‰Â”\‚È‚çjLow-pass filter‚âHigh-pass filter‚É‚Â‚¢‚ÄAƒvƒƒOƒ‰ƒ€“à‚ÅŒã‚©‚ç‚©‚¯‚é•û–@‚ğ’T‚»‚¤B
+%â‘ Low-pass fileterã‚„High-pass filterã®å€¤ã‚’ç¢ºèªã—ã¦è¨˜å…¥ã—ã‚ˆã†ã€‚
+%â‘¡foræ–‡ã‚’ä½¿ã£ã¦ã€20%, 40% 60%, 80%ãã‚Œãã‚Œã®ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰iEMGã‚’è¨ˆç®—ã—ã¦ã€ã²ã¨ã¤ã®è¡Œåˆ—ã«æ ¼ç´ã—ã‚ˆã†ã€‚
+%â‘¢æœ€å¾Œã«ã€æ¨ªè»¸ã‚’ã€ŒåŠ›ï¼ˆ%MVCï¼‰ã€ã€ç¸¦è»¸ã‚’ã€ŒiEMG(Î¼Vï¼‰ã€ã®ã‚°ãƒ©ãƒ•ã‚’æç”»ã—ã¦ã¿ã‚ˆã†ã€‚
+%â‘£å›å¸°ç›´ç·šã€å›å¸°å¼ã€çµ±è¨ˆå€¤ã‚‚å…¥ã‚Œã¦ã¿ã‚ˆã†ã€‚
+%â‘¤ï¼ˆå¯èƒ½ãªã‚‰ï¼‰Low-pass filterã‚„High-pass filterã«ã¤ã„ã¦ã€ãƒ—ãƒ­ã‚°ãƒ©ãƒ å†…ã§å¾Œã‹ã‚‰ã‹ã‘ã‚‹æ–¹æ³•ã‚’æ¢ãã†ã€‚
