@@ -12,11 +12,11 @@ defaultanswer = {'Masumoto'};
 subject = inputdlg({'subject'},'Input the answer',1,defaultanswer);
 subject_name = char(subject(1));
 
-Force_list = [20,40,60,80];
-iEMG_list = [0,0,0,0];
+Force_list = [20,40,60,80,100];
+iEMG_list = [0,0,0,0,0];
 
 
-for i = 1:4
+for i = 1:5
 
     %サンプリング周波数
     fs = 1000;
@@ -53,6 +53,7 @@ for i = 1:4
     %計測データの定義
     Force = data_filtered(:,1);
     EMG = data_filtered(:,2);
+    
     %EMGは1000μV→1Vなので、マイクロボルト単位に変換（1000倍)
     %基線ズレがある可能性があるので平均を引く:全波整流
     EMG = (EMG-mean(EMG))*1000;
@@ -127,12 +128,12 @@ title('EMGvsForce');
 xlabel('Force (%)');
 ylabel('rEMG (\muV)'); %単位あやしい
 
-xticks([0, 20, 40, 60, 80]);
-yticks([1.0, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]);
+xticks([0, 20, 40, 60, 80, 100]);
+%yticks([1.0, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]);
  
 grid on
 
-%ファイルの保存
+%リストの情報を保存
 output_filename = sprintf('%s_EMGvsForce',subject_name);
 save(output_filename,'iEMG_list');
 
