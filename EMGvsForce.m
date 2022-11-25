@@ -96,22 +96,20 @@ for i = 1:5
     %2•bŠÔ‚ÌÏ•ªU•‚ğŒv‘ª
     iEMG = sum(rEMG);
 
-    iEMG_list(5) = iEMG;
+    iEMG_list(i) = iEMG;
 
     if subject_name == "Egashira"
-        jonah_iEMG_list(5) = iEMG;
+        jonah_iEMG_list(i) = iEMG;
     elseif subject_name == "Takeuchi"
-            takeuchi_iEMG_list(5) = iEMG;
+            takeuchi_iEMG_list(i) = iEMG;
     elseif subject_name == "Yokota"
-            yokota_iEMG_list(5) = iEMG;
+            yokota_iEMG_list(i) = iEMG;
     end
-
 end
 
 %ƒŠƒXƒg‚Ìî•ñ‚ğ•Û‘¶
 output_filename = sprintf('%s_EMGvsForce',subject_name);
 save(output_filename,"iEMG_list");
-
 
 %jonah
 jonah_iEMG_list_r = jonah_iEMG_list ./ jonah_iEMG_list(5) * 100;
