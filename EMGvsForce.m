@@ -8,29 +8,31 @@
 % Sens HI (x1000)
 
 %被験者名
-defaultanswer = {'Masumoto'};
+defaultanswer = {'Egashira'};
 subject = inputdlg({'subject'},'Input the answer',1,defaultanswer);
 subject_name = char(subject(1));
 
 Force_list = [20,40,60,80,100];
 iEMG_list = [0,0,0,0,0];
 
-
+%20%,40%,60%,80%,MVCの順で読み込む(ために5回繰り返し)
 for i = 1:5
 
     %サンプリング周波数
     fs = 1000;
 
     %解析するデータ（matファイル）を選択し、読み込む
-    [fname,pname]=uigetfile('*.mat','解析するデータを選択してください');
-    FP=[fname pname];
-    if fname==0;return;end
+    [fname,pname] = uigetfile('*.mat','解析するデータを選択してください');
+    FP = [fname pname];
+    if fname == 0;return;end
     %fnameがファイル名／pnameはファイルのある場所（ディレクトリ）
     load([pname fname]);
 
     %フィルタリング
     data_filtered = data;
     %ハムカットフィルタ:地域周波数(50Hz)の倍数をフィルタリング
+    %なんで倍数？
+    %ローパスを500Hzに設定してる(500以上はカットしてる)から450まで
     [b50,a50] = butter(3,[49 51]/500,'stop');
     [b100,a100] = butter(3,[99 101]/500,'stop');
     [b150,a150] = butter(3,[149 151]/500,'stop');
@@ -51,11 +53,12 @@ for i = 1:5
     data_filtered = filtfilt(b450,a450,data_filtered);
 
     %計測データの定義
-    Force = data_filtered(:,1);
-    EMG = data_filtered(:,2);
-    
+    %リスト名(行,列) リストの要素を指定.指定しない(全選択)時は:.
+    Force = data_filtered(:,1); %1列目のデータ
+    EMG = data_filtered(:,2); %2列目のデータ
+
     %EMGは1000μV→1Vなので、マイクロボルト単位に変換（1000倍)
-    %基線ズレがある可能性があるので平均を引く:全波整流
+    %基線ズレがある可能性があるので平均を引く
     EMG = (EMG-mean(EMG))*1000;
 
     %全波整流（絶対値化）
@@ -78,6 +81,7 @@ for i = 1:5
 
     uiwait; %何かのアクションがあるまでプログラムがストップ
 
+
     %解析対象区間を設定
     %安定した2秒間のデータを計算
     defaultanswer = {'12','14'};
@@ -92,30 +96,97 @@ for i = 1:5
     %2秒間の積分振幅を計測
     iEMG = sum(rEMG);
 
-    %Force_list(i) = Force;
-    iEMG_list(i) = iEMG;
+    iEMG_list(5) = iEMG;
+
+    if subject_name == "Egashira"
+        jonah_iEMG_list(5) = iEMG;
+    elseif subject_name == "Takeuchi"
+            takeuchi_iEMG_list(5) = iEMG;
+    elseif subject_name == "Yokota"
+            yokota_iEMG_list(5) = iEMG;
+    end
 
 end
 
-x = Force_list';
-y = iEMG_list';
+%リストの情報を保存
+output_filename = sprintf('%s_EMGvsForce',subject_name);
+save(output_filename,"iEMG_list");
 
-%単回帰分析(何やってるかよくわかってない)
+
+%jonah
+jonah_y = jonah_iEMG_list';
+
+%単回帰分析
+x = Force_list';
 X = [ones(length(x), 1) x]; % 切片を含めて近似を改善
-b = X\y;
-yCalc = X * b; % 近似直線
+jonah_b = X\jonah_y;
+jonah_yCalc = X * jonah_b; % 近似直線
+
+disp(jonah_b);
+
+%takeuchi
+takeuchi_y = takeuchi_iEMG_list';
+
+takeuchi_b = X\takeuchi_y;
+takeuchi_yCalc = X * takeuchi_b;
+
+disp(takeuchi_b);
+
+%yokota
+yokota_y = yokota_iEMG_list';
+
+yokota_b = X\yokota_y;
+yokota_yCalc = X * yokota_b;
+
+disp(yokota_b);
+
+%average
+% iEMG_sum = [jonah_iEMG_list; takeuchi_iEMG_list; yokota_iEMG_list]; 
+% err = max(iEMG_sum) - min(iEMG_sum);
+% mean_y = mean(iEMG_sum)';
+% mean_b = X\mean_y;
+% mean_yCalc = X * mean_b;
+% 
+% disp(mean_b);
+
 
 %図示
+%回帰直線
 hold on
-plot(x, yCalc,'LineWidth', 5,'Color','0.7,0.7,0.7');
+plot(x,yokota_yCalc,'LineWidth', 5 ,'Color','0.9,0.7,0.1');
 hold off
 
 hold on
-plot(Force_list,iEMG_list,'w.','MarkerSize',55);
+plot(x,takeuchi_yCalc,'LineWidth', 5 ,'Color','0.4,0.7,0.1');
+hold off
+
+hold on
+plot(x,jonah_yCalc,'LineWidth', 5 ,'Color','0.1,0.5,0.7');
+hold off
+
+%点
+hold on
+plot(Force_list,yokota_iEMG_list,'w.','MarkerSize',50);
 hold off
 
 hold on 
-plot(Force_list,iEMG_list,'k.','MarkerSize',40);
+p1 = plot(Force_list,yokota_iEMG_list,'.','MarkerSize',35,'Color','0.9,0.7,0.1');
+hold off
+
+hold on
+plot(Force_list,takeuchi_iEMG_list,'w.','MarkerSize',50);
+hold off
+
+hold on 
+p2 = plot(Force_list,takeuchi_iEMG_list,'.','MarkerSize',35,'Color','0.4,0.7,0.1');
+hold off
+
+hold on
+plot(Force_list,jonah_iEMG_list,'w.','MarkerSize',50);
+hold off
+
+hold on 
+p3 = plot(Force_list,jonah_iEMG_list,'.','MarkerSize',35,'Color','0.1,0.5,0.7');
 hold off
 
 %フォントサイズ
@@ -125,17 +196,19 @@ set(h,'fontsize',fontsize);
 
 title('EMGvsForce');
 
-xlabel('Force (%)');
-ylabel('rEMG (\muV)'); %単位あやしい
+xlabel('% of MVC'); %名前
+ylabel('iEMG (\muV*ms)'); %単位あやしい、名前
 
-xticks([0, 20, 40, 60, 80, 100]);
+xticks([20, 40, 60, 80, 100]);
 %yticks([1.0, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]);
  
 grid on
+box on
 
-%リストの情報を保存
-output_filename = sprintf('%s_EMGvsForce',subject_name);
-save(output_filename,'iEMG_list');
+legend([p1 p2 p3],{'subject 1','subject 2','subject 3'},'Location','southeast');
+
+%竹内くん:緑　横田くん:黄色　ジョナ:青
+
 
 
 %①Low-pass fileterやHigh-pass filterの値を確認して記入しよう。
